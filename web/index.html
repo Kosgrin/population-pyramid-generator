@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Population Pyramid Generator</title>
+  <meta name="description" content="Build population pyramids from UN World Population Prospects data, right in your browser.">
+  <meta name="theme-color" content="#2c3e50">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-inner">
+      <h1><img src="icons/icon.svg" alt="" width="28" height="28"> Population Pyramid Generator</h1>
+      <button id="install-btn" class="btn ghost" hidden>Install app</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- STEP 1: DATA -->
+    <section class="panel" id="data-panel">
+      <h2><span class="step">1</span> Load data</h2>
+      <p class="muted">
+        Use the UN World Population Prospects files
+        <code>…5-YEAR_AGE_GROUPS_MALE.xlsx</code> and <code>…_FEMALE.xlsx</code>
+        (<a href="https://population.un.org/wpp/downloads?folder=Standard%20Projections&amp;group=Population" target="_blank" rel="noopener">download here</a>).
+        Files are read on your device and never uploaded anywhere.
+      </p>
+      <div class="file-row">
+        <label class="drop" id="drop-male">
+          <input type="file" id="file-male" accept=".xlsx,.xls">
+          <span class="drop-title">♂ Male population</span>
+          <span class="drop-name" id="name-male">Choose or drop .xlsx</span>
+        </label>
+        <label class="drop" id="drop-female">
+          <input type="file" id="file-female" accept=".xlsx,.xls">
+          <span class="drop-title">♀ Female population</span>
+          <span class="drop-name" id="name-female">Choose or drop .xlsx</span>
+        </label>
+      </div>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+      <button id="clear-data" class="btn ghost small" hidden>Forget saved data</button>
+    </section>
+
+    <!-- STEP 2: CONFIGURE -->
+    <section class="panel" id="config-panel" hidden>
+      <h2><span class="step">2</span> Choose countries and years</h2>
+      <datalist id="locations"></datalist>
+      <div id="selections" class="selections"></div>
+      <div class="row gap">
+        <button id="add-pyramid" class="btn">+ Add pyramid</button>
+      </div>
+      <fieldset class="options">
+        <legend>Display options</legend>
+        <label><input type="checkbox" id="opt-values" checked> Show values on bars</label>
+        <label><input type="checkbox" id="opt-tables"> Show data tables</label>
+        <label><input type="checkbox" id="opt-percent"> Show as % of total population</label>
+        <label><input type="checkbox" id="opt-samescale"> Use the same scale for all pyramids</label>
+      </fieldset>
+    </section>
+
+    <!-- STEP 3: RESULTS -->
+    <section id="results-panel" hidden>
+      <div class="row space">
+        <h2><span class="step">3</span> Pyramids</h2>
+        <button id="download-all" class="btn primary">⬇ Download all (PNG)</button>
+      </div>
+      <div id="results" class="results"></div>
+    </section>
+  </main>
+
+  <footer class="wrap muted small-text">
+    Data source: <a href="https://population.un.org/wpp/" target="_blank" rel="noopener">UN World Population Prospects</a>.
+    Tip: tap a pyramid to open a larger view.
+  </footer>
+
+  <dialog id="viewer">
+    <div class="viewer-head">
+      <h3 id="viewer-title"></h3>
+      <button class="btn ghost" id="viewer-close" aria-label="Close">✕</button>
+    </div>
+    <canvas id="viewer-canvas"></canvas>
+    <div class="row gap">
+      <button class="btn primary" id="viewer-png">⬇ PNG</button>
+      <button class="btn" id="viewer-csv">⬇ CSV</button>
+    </div>
+    <div id="viewer-table"></div>
+  </dialog>
+
+  <template id="selection-tpl">
+    <div class="sel">
+      <div class="sel-head">
+        <strong class="sel-title"></strong>
+        <button class="btn ghost small sel-remove" aria-label="Remove">✕</button>
+      </div>
+      <label>Country / area
+        <input type="text" class="sel-country" list="locations" autocomplete="off" spellcheck="false">
+      </label>
+      <label>Year
+        <select class="sel-year"></select>
+      </label>
+    </div>
+  </template>
+
+  <script src="pyramid.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

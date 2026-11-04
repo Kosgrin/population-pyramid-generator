@@ -1,191 +1,115 @@
 # 🌍 Population Pyramid Generator
 
-A powerful and interactive Streamlit application for generating population pyramids from UN World Population Prospects data. Create beautiful visualizations with support for multiple countries, years.
+Build population pyramids from UN World Population Prospects data — right in your browser.
+No server, no Python, no installation: the app is a static web page that can be hosted on
+GitHub Pages, works offline once opened, and can be installed as a desktop or phone app.
 
-![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
-![Streamlit](https://img.shields.io/badge/streamlit-1.28+-red.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
+
+**Live app:** `https://kosgrin.github.io/population-pyramid-generator/` (after enabling GitHub Pages, see below)
 
 ## ✨ Features
 
-- 📊 **Multiple Pyramids**: Generate up to 6 population pyramids simultaneously
-- 📈 **Interactive Visualizations**: Toggle value labels and data tables
-- 🎨 **Smart Layout**: Automatic grid arrangement (3 pyramids per row)
-- 💾 **Export Functionality**: Download pyramids as high-quality PNG images
-- 🔍 **Full-View Mode**: Expandable view with detailed data tables
-- ⚡ **Performance Optimized**: Async data processing prevents UI freezing
-- 🎯 **Flexible Selection**: Compare different countries or same country across different years
+- 📊 **Up to 12 pyramids at once** — compare countries, or one country across years
+- 🔎 **Searchable country list** and per-country year list
+- 🏷️ **Value labels** on bars (toggle)
+- 📋 **Data tables** with male / female / total and % of total
+- 📐 **% of total population** mode for fair comparisons between countries of different sizes
+- ⚖️ **Same scale** option so several pyramids can be compared at a glance
+- 💾 **Downloads**: PNG for each pyramid, all pyramids in one PNG, and CSV data
+- 🔒 **Private**: Excel files are read on your device; nothing is uploaded
+- 🧠 **Remembers your data** and choices between visits (stored in your browser)
+- 📴 **Works offline** and can be **installed as an app** (Chrome/Edge: “Install app” button or the install icon in the address bar; iPhone: Share → Add to Home Screen)
+- 🌙 Light and dark mode, works on phones
 
-## 🖼️ Screenshots
+## 📊 Data
 
-### Main Interface
-- Upload male and female population data
-- Select multiple countries and years
-- Configure display options
+Download from [UN World Population Prospects](https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=Population):
 
-### Generated Pyramids
-- Clean, professional visualizations
-- Color-coded male (blue) and female (red) populations
-- Total population statistics overlay
+- **Male**: `WPP2024_POP_F02_2_POPULATION_5-YEAR_AGE_GROUPS_MALE.xlsx`
+- **Female**: `WPP2024_POP_F02_3_POPULATION_5-YEAR_AGE_GROUPS_FEMALE.xlsx`
 
-### Data Tables
-- Detailed numerical breakdown
-- Age group analysis
-- Easy-to-read formatting
+The app finds the header row automatically (the one containing
+`Region, subregion, country or area *`, `Year` and age columns like `0-4` … `100+`).
+It reads both the **Estimates** (1950–2023) and **Medium variant** (2024–2100) sheets,
+so past data and projections are both available. Values in the files are in thousands.
 
-## 📋 Requirements
+## 🚀 Usage
 
-```txt
-streamlit>=1.28.0
-pandas>=2.0.0
-matplotlib>=3.7.0
-numpy>=1.24.0
-openpyxl>=3.1.0
-```
+1. Open the app and choose the male and female files (or drop both onto either box).
+2. Pick a country/area and a year for each pyramid; use **+ Add pyramid** for more.
+3. Toggle the display options. Charts update instantly.
+4. Tap a pyramid to enlarge it, or use the PNG / CSV buttons to download.
 
-## 🚀 Installation
+## 🌐 Deploying to GitHub Pages
 
-1. **Clone the repository**
+The workflow in `.github/workflows/pages.yml` publishes the `web/` folder on every push to `main`.
+
+One-time setup: in the repository go to **Settings → Pages → Build and deployment → Source**
+and choose **GitHub Actions**. After the next push to `main` (or running the workflow manually
+from the **Actions** tab) the app is live at `https://<user>.github.io/population-pyramid-generator/`.
+
+## 💻 Running locally
+
+Any static file server works, for example:
+
 ```bash
-git clone https://github.com/yourusername/population-pyramid-generator.git
-cd population-pyramid-generator
+python3 -m http.server 8000 -d web
 ```
 
-2. **Install dependencies**
-```bash
-pip install -r requirements.txt
+Then open <http://localhost:8000>. (Opening `index.html` directly from disk won't work,
+because browsers block the background file reader on `file://` pages.)
+
+## 🗂️ Project structure
+
 ```
-
-3. **Run the application**
-```bash
-streamlit run pop_pyramid_streamlit.py
+web/
+  index.html            page layout
+  style.css             styles (light + dark)
+  app.js                UI: loading files, selections, downloads
+  pyramid.js            draws the pyramid on a canvas
+  worker.js             reads the Excel files in the background
+  sw.js                 offline support
+  manifest.webmanifest  makes the app installable
+  vendor/               SheetJS (Excel reader), bundled so no CDN is needed
+legacy/
+  streamlit_app.py      the original Streamlit version
 ```
-
-The app will open automatically in your default browser at `http://localhost:8501`
-
-## 📊 Data Format
-
-The application expects UN World Population Prospects 2024 format Excel files:
-
-### Required Files
-- **Male Population Data**: `WPP2024_POP_F02_2_POPULATION_5-YEAR_AGE_GROUPS_MALE.xlsx`
-- **Female Population Data**: `WPP2024_POP_F02_3_POPULATION_5-YEAR_AGE_GROUPS_FEMALE.xlsx`
-
-### Data Structure
-- Header row starts at row 17 (skiprows=16)
-- Required columns:
-  - `Region, subregion, country or area *`
-  - `Year`
-  - Age group columns: `0-4`, `5-9`, `10-14`, ..., `100+`
-
-### Where to Get Data
-Download the latest data from [UN World Population Prospects](https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=Population)
-
-## 🎯 Usage
-
-### Step 1: Upload Data Files
-1. Click "Upload Male Population Data (XLSX)" and select your male data file
-2. Click "Upload Female Population Data (XLSX)" and select your female data file
-3. Wait for the success message showing the number of countries and years loaded
-
-### Step 2: Configure Pyramids
-1. Select the number of pyramids (1-6) using the number input
-2. For each pyramid:
-   - Choose a country from the searchable dropdown
-   - Select a year from the available years
-3. Toggle display options:
-   - **Show values on bars**: Display population numbers directly on pyramid bars
-   - **Show data tables**: Show detailed numerical data below pyramids
-
-### Step 3: Generate and Download
-1. Click "🎨 Generate Pyramids" button
-2. Wait for processing (progress bar shown)
-3. View pyramids in grid layout
-4. Click on any pyramid to expand full view with data table
-5. Download individual pyramids as PNG files
-
 
 ## 🎨 Customization
 
-### Modifying Colors
-Edit the `create_population_pyramid()` function:
-```python
-# Male color (currently blue)
-color='#3498db'
+Colors live at the top of `web/pyramid.js`:
 
-# Female color (currently red)
-color='#e74c3c'
+```js
+const COLORS = { male: '#3498db', female: '#e74c3c', ... };
 ```
 
-### Adjusting Chart Size
-Modify the figure size in `create_population_pyramid()`:
-```python
-fig, ax = plt.subplots(figsize=(12, 8))  # width, height in inches
+## 🐍 Old Streamlit version
+
+The original Streamlit app is kept in `legacy/`:
+
+```bash
+pip install -r legacy/requirements.txt
+streamlit run legacy/streamlit_app.py
 ```
-
-## 🔧 Troubleshooting
-
-### Issue: UI Freezes When Selecting Countries
-**Solution**: Make sure you're clicking "Generate Pyramids" button. Country/year selection doesn't process data until you click the button.
-
-### Issue: "No data found" Warning
-**Solution**: Verify that:
-- The selected country name exactly matches the data
-- The selected year is available in the dataset
-- Both male and female files contain the data
-
-### Issue: Data Values Show Incorrect Numbers
-**Solution**: Ensure your Excel files:
-- Have numeric values in age group columns
-- Use the correct header row (row 17)
-- Follow UN World Population Prospects format
-
-### Issue: Download Button Error
-**Solution**: This is fixed in the latest version. Each download button has a unique key.
-
-## 📝 Example Use Cases
-
-1. **Demographic Analysis**: Compare population structures across countries
-2. **Historical Trends**: Track how a country's demographics evolved over time
-3. **Policy Planning**: Visualize age distribution for resource allocation
-4. **Educational Material**: Create teaching materials for demographics courses
-5. **Research Publications**: Generate publication-ready population pyramids
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT — see [LICENSE](LICENSE). Bundled [SheetJS](https://sheetjs.com/) is Apache-2.0 licensed (`web/vendor/xlsx-LICENSE.txt`).
 
 ## 🙏 Acknowledgments
 
-- Data source: [UN World Population Prospects 2024](https://population.un.org/wpp/)
-- Built with [Streamlit](https://streamlit.io/)
-- Visualization powered by [Matplotlib](https://matplotlib.org/)
+- Data: [UN World Population Prospects 2024](https://population.un.org/wpp/)
+- Excel reading: [SheetJS](https://sheetjs.com/)
 
 ## 📧 Contact
 
-For questions, suggestions, or issues:
-- Open an issue on GitHub
-- Contact: grinyakkostya@gmail.com
+Open an issue on GitHub or email grinyakkostya@gmail.com.
 
 ## 🗺️ Roadmap
 
-- [ ] Add more visualization types (line charts, area charts)
-- [ ] Export to PDF with multiple pyramids
-- [ ] Comparison mode (overlay two pyramids)
-- [ ] Animation feature (show changes over time)
-- [ ] More language support (Spanish, French, German)
-- [ ] Dark mode theme
+- [ ] Animation over time for one country
+- [ ] Overlay two pyramids for comparison
+- [ ] Export several pyramids to PDF
 - [ ] Custom color schemes
-- [ ] API integration for automatic data updates
-
----
+- [ ] Optional built-in dataset so no download is needed
